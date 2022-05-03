@@ -1,9 +1,8 @@
 package ru.marslab.simplemovedcar.presentation.mainscreen.model
 
-import android.graphics.Point
+import androidx.compose.ui.unit.DpOffset
 
 data class MainScreenState(
-    val startPosition: Point = Point(0, 0),
-    val stopPosition: Point = Point(0, 0),
-    val isMoved: Boolean = false
+    val startPosition: DpOffset = DpOffset.Zero,
+    val stopPosition: DpOffset = DpOffset.Zero
 )
