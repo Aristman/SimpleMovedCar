@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -72,23 +73,7 @@ private fun MainScreenView(viewModel: MainViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color.LightGray)
-            .pointerInput(Unit) {
-                coroutineScope {
-                    while (true) {
-                        val position = awaitPointerEventScope {
-                            awaitFirstDown().position
-                        }
-                        viewModel.sendAction(
-                            MainScreenAction.FieldClick(
-                                DpOffset(
-                                    (position.x / densityDp).dp - CAR_SIZE.div(2),
-                                    (position.y / densityDp).dp - CAR_SIZE.div(2)
-                                )
-                            )
-                        )
-                    }
-                }
-            }
+            .pointerInput(Unit) { clickHandler(viewModel, densityDp) }
     ) {
         Image(
             painter = painterResource(id = R.drawable.car),
@@ -98,5 +83,26 @@ private fun MainScreenView(viewModel: MainViewModel) {
                 .requiredSize(88.dp)
                 .clickable { viewModel.sendAction(MainScreenAction.CarStartClick) }
         )
+    }
+}
+
+private suspend fun PointerInputScope.clickHandler(
+    viewModel: MainViewModel,
+    densityDp: Float
+) {
+    coroutineScope {
+        while (true) {
+            val position = awaitPointerEventScope {
+                awaitFirstDown().position
+            }
+            viewModel.sendAction(
+                MainScreenAction.FieldClick(
+                    DpOffset(
+                        (position.x / densityDp).dp - CAR_SIZE.div(2),
+                        (position.y / densityDp).dp - CAR_SIZE.div(2)
+                    )
+                )
+            )
+        }
     }
 }
