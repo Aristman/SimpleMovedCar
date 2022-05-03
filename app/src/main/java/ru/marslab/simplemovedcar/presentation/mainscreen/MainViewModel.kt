@@ -1,6 +1,8 @@
 package ru.marslab.simplemovedcar.presentation.mainscreen
 
-import android.graphics.Point
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.marslab.simplemovedcar.core.BaseViewModel
 import ru.marslab.simplemovedcar.presentation.mainscreen.model.MainScreenAction
@@ -12,6 +14,12 @@ import kotlin.random.Random
 @HiltViewModel
 class MainViewModel @Inject constructor() :
     BaseViewModel<MainScreenState, MainScreenEvent, MainScreenAction>(MainScreenState()) {
+    private var screenSize: DpOffset = DpOffset.Zero
+
+    fun setScreenSize(width: Dp, height: Dp) {
+        screenSize = DpOffset(width, height)
+    }
+
     override fun reduceStateByAction(
         currentState: MainScreenState,
         action: MainScreenAction
@@ -21,11 +29,17 @@ class MainViewModel @Inject constructor() :
                 val carPosition = state.value.stopPosition
                 state.value.copy(
                     startPosition = carPosition,
-                    stopPosition = Point(
-                        if (Random.nextBoolean()) 1 else 0,
-                        if (Random.nextBoolean()) 1 else 0
-                    ),
-                    isMoved = true
+                    stopPosition = DpOffset(
+                        if (Random.nextBoolean()) screenSize.x else 0.dp,
+                        if (Random.nextBoolean()) screenSize.y else 0.dp
+                    )
+                )
+            }
+            is MainScreenAction.FieldClick -> {
+                val carPosition = state.value.stopPosition
+                state.value.copy(
+                    startPosition = carPosition,
+                    stopPosition = action.position
                 )
             }
         }
